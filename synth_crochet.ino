@@ -22,18 +22,7 @@ int pot4 = A3;
 int pot5 = A4;
 
 //ADD BUTTONS
-const int buttonPin1 = 2;
-const int buttonPin2 = 3;
-const int buttonPin3 = 4;
-const int buttonPin4 = 5;
-
-int button1 = 1;
-int button2 = 0;
-int button3 = 0;
-int button4 = 0;
-
-//byte buttons[4] = {B1000};
-
+const int buttonPins[] = {2, 3, 4, 5};
 
 /////////////////////////////////////
 
@@ -62,10 +51,8 @@ void setup() {
 
     Serial.begin(115200);
 
-    pinMode(buttonPin1, INPUT_PULLUP);
-    pinMode(buttonPin2, INPUT_PULLUP);
-    pinMode(buttonPin3, INPUT_PULLUP);
-    pinMode(buttonPin4, INPUT_PULLUP);
+    for (int i=0; i<4; i++)
+        pinMode(buttonPins[i], INPUT_PULLUP);
 
     // SETUP SYNTH
     edgar.begin();
@@ -130,22 +117,17 @@ void loop()
 
 
 void checkButtons(){
+    static int buttons[4] = {0};
 
-    button1 = digitalRead(buttonPin1);
-    button2 = digitalRead(buttonPin2);
-    button3 = digitalRead(buttonPin3);
-    button4 = digitalRead(buttonPin4);
+    for (int i=0; i<4; i++) {
+        if (buttons[i] != digitalRead(buttonPins[i])) {
+            buttons[i] = digitalRead(buttonPins[i]);
+            voice = i;
 
-    if (button1 == HIGH) {
-        voice = 0;
-    } else if (button2 == HIGH) {
-        voice = 1;
-    }else if (button3 == HIGH) {
-        voice = 2;
-    } else {
-        voice = 3;
+            Serial.print("button changed => voice = ");
+            Serial.println(voice);
+        }
     }
-
 }
 
 void saveNewValues(int voice){
