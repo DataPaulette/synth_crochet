@@ -157,7 +157,6 @@ void saveNewValues(int voice){
     edgar.setLength(voice,synths[voice][4]);
     edgar.setMod(voice,synths[voice][5]);
     currentEnvelope = synths[voice][3];
-    return voice;
 
 }
 
