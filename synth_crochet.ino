@@ -62,10 +62,10 @@ void setup() {
 
     Serial.begin(115200);
 
-    pinMode(buttonPin1, INPUT);
-    pinMode(buttonPin2, INPUT);
-    pinMode(buttonPin3, INPUT);
-    pinMode(buttonPin4, INPUT);
+    pinMode(buttonPin1, INPUT_PULLUP);
+    pinMode(buttonPin2, INPUT_PULLUP);
+    pinMode(buttonPin3, INPUT_PULLUP);
+    pinMode(buttonPin4, INPUT_PULLUP);
 
     // SETUP SYNTH
     edgar.begin();
