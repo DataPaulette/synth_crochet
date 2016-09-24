@@ -15,21 +15,15 @@
 // arduino nonsense
 #include <synth.h>
 
-int pot1 = A0;
-int pot2 = A1;
-int pot3 = A2;
-int pot4 = A3;
-int pot5 = A4;
+int potPins[] = {A0, A2, A3, A4};
+const int NB = sizeof potPins / sizeof potPins[0];
 
 //ADD BUTTONS
 const int buttonPins[] = {2, 3, 4, 5};
 
 /////////////////////////////////////
 
-int val1 = 0;
-int val2 = 0;
-int val3 = 0;
-int val4 = 0;
+int vals[NB] = {0};
 int voice = 0;
 int old_voice = 0;
 int currentEnvelope = 0;
@@ -37,8 +31,8 @@ int currentEnvelope = 0;
 int waveform[] = {SINE,TRIANGLE,SQUARE,SAW,RAMP,NOISE};
 int envelopes[] = {ENVELOPE1,ENVELOPE2,ENVELOPE3};
 int pitch[] = {60,0,0,0};
-int leng[] = {60,64,70,20};
-int mod[] = {60,64,64,64};
+int leng[] = {60,64,70,20}; // TODO
+int mod[] = {60,64,64,64};  // TODO
 
 int synths[2][3];
 
@@ -51,7 +45,7 @@ void setup() {
 
     Serial.begin(115200);
 
-    for (int i=0; i<4; i++)
+    for (int i=0; i<NB; i++)
         pinMode(buttonPins[i], INPUT_PULLUP);
 
     // SETUP SYNTH
@@ -68,12 +62,10 @@ void setup() {
 void loop()
 {
     //-Plays some notes on the voices:
+    for (int i = 0; i < NB-1; i++)
+        vals[i] = map(analogRead(potPins[i]), 0, 1024, 0, 127);
+    vals[5] = map(analogRead(potPins[5]), 0, 1024, 0, 4);
 
-    int val1 = map(analogRead(pot1), 0, 1024, 0, 127);
-    int val2 = map(analogRead(pot2), 0, 1024, 0, 127);
-    int val3 = map(analogRead(pot3), 0, 1024, 0, 127);
-    int val4 = map(analogRead(pot4), 0, 1024, 0, 127);
-    int val5 = map(analogRead(pot5), 0, 1024, 0, 4);
     // print out the value you read:
     Serial.print("Synth: ");
     Serial.print(voice);
@@ -91,35 +83,32 @@ void loop()
     checkButtons();
     getNewSynth();
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < NB; i++)
     {
-        //edgar.setWave(voice,val1);
-        edgar.setFrequency(voice,val1);
+        edgar.setFrequency(voice,vals[1]);
 
         // MOD
-        edgar.setMod(voice,val2);
+        edgar.setMod(voice,vals[2]);
 
         // PITH
-        edgar.setPitch(voice,val3);
+        edgar.setPitch(voice,vals[3]);
 
         // LENGTH
-        edgar.setLength(voice,4);
+        edgar.setLength(voice, NB);
 
         // ENVELOPE
         edgar.setEnvelope(voice,currentEnvelope);
 
         // PLAY NOTE
-        edgar.mTrigger(voice, val5);
-
-        // delay(300);
+        edgar.mTrigger(voice, vals[5]);
     }
 }
 
 
 void checkButtons(){
-    static int buttons[4] = {0};
+    static int buttons[NB] = {0};
 
-    for (int i=0; i<4; i++) {
+    for (int i=0; i<NB; i++) {
         if (buttons[i] != digitalRead(buttonPins[i])) {
             buttons[i] = digitalRead(buttonPins[i]);
             voice = i;
@@ -155,3 +144,4 @@ void getNewSynth(){
         old_voice = voice;
     }
 }
+
